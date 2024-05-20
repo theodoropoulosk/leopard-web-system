@@ -1,0 +1,29 @@
+Waterfall
+
+Requirements Definition:
+•	Database for 100 students, 10 instructors, and 1 admin
+•	Database of courses and its info (CRN, Prerequisites, etc.)
+•	3 types of users (Student, instructor, admin)
+•	Gather all requirements.
+
+System Design:
+•	Document detailed functional and nonfunctional requirements.
+•	Collect and store user information.
+•	Student information is put into columns.
+
+Implementation and Unit testing:
+•	Figure out what users can do that can cause error in system.
+•	Create classes including attributes and methods. 
+•	Add user interface.
+•	Test functionality. 
+
+System testing
+•	Perform integration testing.
+•	Look for any possible issues.
+•	Verify that all requirements have been met.
+
+Operation and maintenance:
+•	Final checks and deploy system.
+•	Include training.
+•	Take feedback from users (Students, instructors, admin).
+•	Perform updates, repairs and upgrades.
