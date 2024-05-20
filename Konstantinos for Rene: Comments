@@ -1,0 +1,10 @@
+Waterfall model:
+You could add a function where students, instructors, and admins can see all the information on the system about them.
+You could add a "unit testing" stage where you test each part first before connecting students, instructors, and admins together.
+
+Incremental Development model:
+You could have students registering for classes on the first version, and instructors being able to see who's on their class on the
+second version. This way, you wouldn't have to connect the different classes at all until version 2.
+
+Integrate and Configure:
+I don't have any comments.
