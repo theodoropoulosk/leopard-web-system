@@ -1,4 +1,27 @@
 Integrate and Configure
 
+Requirements Specification
+•	Gather requirements for the functionalities of the students, instructors and the admin.
+•	Features for each user
+  o	Students – enroll, view schedule and available courses, 
+  o	Instructors - view course schedule and their own roster
+  o Admins – make changes to courses, users, and schedule.
 
+Component Analysis
+• Research and use existing programs that can help fulfill the requirements.
+  o	For user interface, bookkeeping, course roster management, etc.
 
+Requirements Modification
+•	Revise requirements to ensure all functionalities are met.
+
+System Design with Reuse
+•	Reconfigure or redesign to meet system needs.
+  o	Could be interface or components.
+
+Development and Integration
+•	Integrate all components to perform unit testing.
+
+System Validation
+•	Test components before deploying to user.
+•	Collect feedback from all users (Students, instructor, and admin) and address issues.
+•	Once validated, the university can use the program.
