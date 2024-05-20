@@ -1,0 +1,10 @@
+Waterfall model:
+I don't have any comments.
+
+Integrate and Configure model:
+You could include some ideas for where to find suitable material for our project 
+and what type of material that would be (databases, GUIs of other programs).
+
+Incremental Development model:
+You could explain at which point you would add the admin class functionaity, and at which point 
+would all the classes be working with each other.
