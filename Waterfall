@@ -1,28 +1,28 @@
 Waterfall
 
-Requirements Definition:
+Requirements Definition: (Week 1-2)
 •	Database for 100 students, 10 instructors, and 1 admin
 •	Database of courses and its info (CRN, Prerequisites, etc.)
 •	3 types of users (Student, instructor, admin)
 •	Gather all requirements.
 
-System Design:
+System Design: (Week 3-5)
 •	Document detailed functional and nonfunctional requirements.
 •	Collect and store user information.
 •	Student information is put into columns.
 
-Implementation and Unit testing:
+Implementation and Unit testing: (Week 6-8)
 •	Figure out what users can do that can cause error in system.
 •	Create classes including attributes and methods. 
 •	Add user interface.
 •	Test functionality. 
 
-System testing
+System testing (Week 9-12)
 •	Perform integration testing.
 •	Look for any possible issues.
 •	Verify that all requirements have been met.
 
-Operation and maintenance:
+Operation and maintenance: (Week 13-14)
 •	Final checks and deploy system.
 •	Include training.
 •	Take feedback from users (Students, instructors, admin).
