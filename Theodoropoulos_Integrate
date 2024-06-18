@@ -1,9 +1,0 @@
-https://github.com/topics/student-registration 
-On the website above, there are many projects where people created student registration systems. Even though most of them were created using JavaScript or Python, they can 
-still be used to see how features are integrated in different projects.
-
-https://github.com/bpdesilva/Student-Registration-System 
-This GitHub repository was created for a similar project created with C++. It doesn’t include any files for different classes, but the main might be useful.
-
-Finally, LeopardWeb is an obvious source of inspiration, as it’s also the program we’re trying to replicate. We can look at how it’s designed, what are its problems, and 
-decide on what to use for our version and what to change. 
