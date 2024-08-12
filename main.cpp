@@ -3,7 +3,7 @@
 #include "Student.h"
 #include "Instructor.h"
 #include "Admin.h"
-#include "Course.h"
+//#include "Course.h"
 #include "sqlite3.h"
 #include <string>
 #include <vector>
@@ -99,6 +99,7 @@ void menuStudent(sqlite3* db, string username) {
 	string param, value;
 
 	vector<string> container;
+	vector<string> container2;
 	int exit = 0;
 	char* messageError;
 
@@ -125,12 +126,25 @@ void menuStudent(sqlite3* db, string username) {
 	Student student1(name, last, email, major, id_int, year_int);
 	container.clear();
 
+	int L;
+	int found = 0;
+	string crn;
+	string search[5];
+	search[0] = "SELECT CRN FROM ROSTER WHERE ROSTER.STUDENT1 = '" + email + "'";
+	search[1] = "SELECT CRN FROM ROSTER WHERE ROSTER.STUDENT2 = '" + email + "'";
+	search[2] = "SELECT CRN FROM ROSTER WHERE ROSTER.STUDENT3 = '" + email + "'";
+	search[3] = "SELECT CRN FROM ROSTER WHERE ROSTER.STUDENT4 = '" + email + "'";
+	search[4] = "SELECT CRN FROM ROSTER WHERE ROSTER.STUDENT5 = '" + email + "'";
+
 	do {
 		cout << "Menu:\n";
 		cout << "1. Search All Courses\n";
 		cout << "2. Search Courses by Parameter\n";
-		cout << "3. Print Information\n";
-		cout << "4. Exit\n";
+		cout << "3. Register for Course\n";
+		cout << "4. Drop Course\n";
+		cout << "5. Print Schedule\n";
+		cout << "6. Print Information\n";
+		cout << "7. Exit\n";
 		cout << "Enter your choice: ";
 		cin >> choice;
 
@@ -145,16 +159,135 @@ void menuStudent(sqlite3* db, string username) {
 			cin >> value;
 			searchCoursesByParameters(db, param, value);
 			break;
-		case 3:
+		case 3:	// register for course
+			cout << "Enter the CRN of the course: ";
+			cin >> crn;
+
+			query = "SELECT * FROM ROSTER WHERE ROSTER.CRN = '" + crn + "'";
+			exit = sqlite3_exec(db, query.c_str(), callback2save, &container, &messageError);
+
+			cout << "CRN -- STUDENT 1 -- STUDENT 2 -- STUDENT 3 -- STUDENT 4 -- STUDENT 5" << endl;
+			L = container.size();
+			for (int i = 0; i < L; i++) {
+				cout << container[i];
+				//container.erase(container.begin());
+				if ((((i + 1) % 6) == 0) && (i > 0))
+					cout << endl;
+				else
+					cout << " -- ";
+			}
+			if (container[5] != "EMPTY") {
+				cout << "There is no more space in this course." << endl;
+			}
+			else {
+				for (int i = 1; i < 6; i++) {
+					if (container[i] == email) {
+						found = 1;
+					}
+				}
+				if (found == 1) {
+					cout << "Student is already registered for this course." << endl;
+					break;
+				}
+				else {
+					for (int i = 1; i < 6; i++) {
+						if (container[i] == "EMPTY") {
+							container[i] = email;
+							break;
+						}
+					}
+				}
+			}
+			query = ("DELETE FROM ROSTER WHERE CRN = " + crn);
+			exit = sqlite3_exec(db, query.c_str(), NULL, 0, &messageError);
+			query = ("INSERT INTO ROSTER VALUES(" + container[0] + ",'" + container[1] + "','" + container[2] + "','" +
+				container[3] + "','" + container[4] + "','" + container[5] + "');");
+			exit = sqlite3_exec(db, query.c_str(), NULL, 0, &messageError);
+			if (exit != SQLITE_OK)
+			{
+				std::cerr << "Error Insert" << std::endl;
+				sqlite3_free(messageError);
+			}
+			else
+				std::cout << "Roster created successfully!" << std::endl;
+
+			container.clear();
+			break;
+		case 4:	// drop course
+			cout << "Enter the CRN of the course: ";
+			cin >> crn;
+
+			query = "SELECT * FROM ROSTER WHERE ROSTER.CRN = '" + crn + "'";
+			exit = sqlite3_exec(db, query.c_str(), callback2save, &container, &messageError);
+
+			cout << "CRN -- STUDENT 1 -- STUDENT 2 -- STUDENT 3 -- STUDENT 4 -- STUDENT 5" << endl;
+			L = container.size();
+			for (int i = 0; i < L; i++) {
+				cout << container[i];
+				//container.erase(container.begin());
+				if ((((i + 1) % 6) == 0) && (i > 0))
+					cout << endl;
+				else
+					cout << " -- ";
+			}
+			if (container[1] == "EMPTY") {
+				cout << "There are no students in this course." << endl;
+			}
+			else {
+				for (int i = 1; i < 6; i++) {
+					if (container[i] == email) {
+						container.erase(container.begin() + i);
+						container.push_back("EMPTY");
+						break;
+					}
+				}
+			}
+			query = ("DELETE FROM ROSTER WHERE CRN = " + crn);
+			exit = sqlite3_exec(db, query.c_str(), NULL, 0, &messageError);
+			query = ("INSERT INTO ROSTER VALUES(" + container[0] + ",'" + container[1] + "','" + container[2] + "','" +
+				container[3] + "','" + container[4] + "','" + container[5] + "');");
+			exit = sqlite3_exec(db, query.c_str(), NULL, 0, &messageError);
+			if (exit != SQLITE_OK)
+			{
+				std::cerr << "Error Insert" << std::endl;
+				sqlite3_free(messageError);
+			}
+			else
+				std::cout << "Roster created successfully!" << std::endl;
+			container.clear();
+			break;
+		case 5:	// print schedule
+			cout << "CRN -- TITLE -- DEPT -- TIME -- DAYS -- SEMESTER -- YEAR -- CREDITS" << endl;
+			for (int i = 0; i < 5; i++) {
+				exit = sqlite3_exec(db, search[i].c_str(), callback2save, &container, &messageError);
+				L = container.size();
+				if (L != 0) {
+					query = "SELECT * FROM COURSE WHERE COURSE.CRN = " + container[0];
+					exit = sqlite3_exec(db, query.c_str(), callback2save, &container2, &messageError);
+					L = container2.size();
+					for (int i = 0; i < L; i++) {
+						cout << container2[0];
+						container2.erase(container2.begin());
+						if ((((i + 1) % 8) == 0) && (i > 0))
+							cout << endl;
+						else
+							cout << " -- ";
+					}
+					container2.clear();
+				}
+				container.clear();
+			}
+			break;
+		case 6:
 			student1.print_info();
 			break;
-		case 4:
+		case 7:
 			cout << "Exiting...\n";
 			break;
 		default:
 			cout << "Invalid choice, please try again.\n";
 		}
-	} while (choice != 4);
+	} while (choice != 7);
 
 	student1.~student1();
 }
@@ -197,11 +330,13 @@ void menuInstructor(sqlite3* db, string username) {
 		cout << "2. Search Courses by Parameter\n";
 		cout << "3. Print Information\n";
 		cout << "4. Print Instructor's Courses\n";
-		cout << "5. Exit\n";
+		cout << "5. Print Course Roster\n";
+		cout << "6. Exit\n";
 		cout << "Enter your choice: ";
 		cin >> choice;
 
 		int L;
+		string crn;
 
 		switch (choice) {
 		case 1:
@@ -241,13 +376,32 @@ void menuInstructor(sqlite3* db, string username) {
 			}
 			container.clear();
 			break;
-		case 5:
+		case 5:	// print course roster
+			cout << "Enter CRN of course: ";
+			cin >> crn;
+
+			query = "SELECT * FROM ROSTER WHERE ROSTER.CRN = '" + crn + "'";
+			exit = sqlite3_exec(db, query.c_str(), callback2save, &container, &messageError);
+
+			cout << "CRN -- STUDENT 1 -- STUDENT 2 -- STUDENT 3 -- STUDENT 4 -- STUDENT 5" << endl;
+			L = container.size();
+			for (int i = 0; i < L; i++) {
+				cout << container[0];
+				container.erase(container.begin());
+				if ((((i + 1) % 6) == 0) && (i > 0))
+					cout << endl;
+				else
+					cout << " -- ";
+			}
+			container.clear();
+			break;
+		case 6:
 			cout << "Exiting...\n";
 			break;
 		default:
 			cout << "Invalid choice, please try again.\n";
 		}
-	} while (choice != 5);
+	} while (choice != 6);
 
 	instructor1.~instructor1();
 }
@@ -287,19 +441,23 @@ void menuAdmin(sqlite3* db, string username) {
 		cout << "1. Search All Courses\n";
 		cout << "2. Search Courses by Parameter\n";
 		cout << "3. Print Information\n";
-		cout << "4. Add Course\n";
-		cout << "5. Remove Course\n";
-		cout << "6. Add Instructor\n";
-		cout << "7. Remove Instructor\n";
-		cout << "8. Add Student\n";
-		cout << "9. Remove Student\n";
-		cout << "10. Exit\n";
+		cout << "4. Print Course Roster\n";
+		cout << "5. Add Course\n";
+		cout << "6. Remove Course\n";
+		cout << "7. Add Instructor\n";
+		cout << "8. Remove Instructor\n";
+		cout << "9. Add Student\n";
+		cout << "10. Remove Student\n";
+		cout << "11. Add Student to Course\n";
+		cout << "12. Remove Student from Course\n";
+		cout << "13. Exit\n";
 		cout << "Enter your choice: ";
 		cin >> choice;
 
 		string crn, course_title, course_dept, time, days, semester, course_year, credits;
-		int course_crn;
+		int course_crn, L;
 		string id2, name2, surname2, title2, year2, dept2, email2, major2, pass2;
+		int found = 0;
 
 		switch (choice) {
 		case 1:
@@ -315,7 +473,26 @@ void menuAdmin(sqlite3* db, string username) {
 		case 3:
 			admin1.print_info();
 			break;
-		case 4: // add courses
+		case 4:	// print course roster
+			cout << "Enter CRN of course: ";
+			cin >> crn;
+
+			query = "SELECT * FROM ROSTER WHERE ROSTER.CRN = '" + crn + "'";
+			exit = sqlite3_exec(db, query.c_str(), callback2save, &container, &messageError);
+
+			cout << "CRN -- STUDENT 1 -- STUDENT 2 -- STUDENT 3 -- STUDENT 4 -- STUDENT 5" << endl;
+			L = container.size();
+			for (int i = 0; i < L; i++) {
+				cout << container[0];
+				container.erase(container.begin());
+				if ((((i + 1) % 6) == 0) && (i > 0))
+					cout << endl;
+				else
+					cout << " -- ";
+			}
+			container.clear();
+			break;
+		case 5: // add courses
 			cout << "Enter CRN of new course: ";
 			cin >> crn;
 			cout << "Enter title of new course: ";
@@ -335,13 +512,13 @@ void menuAdmin(sqlite3* db, string username) {
 			cin >> credits;
 			admin1.add_courses(crn, title, course_dept, time, days, semester, course_year, credits);
 			break;
-		case 5: // remove courses
+		case 6: // remove courses
 			cout << "Please enter the CRN of the course you want to remove: ";
 			cin >> crn;
 			course_crn = stoi(crn);
 			admin1.remove_courses(course_crn);
 			break;
-		case 6: // add instructor
+		case 7: // add instructor
 			cout << "Adding an instructor" << endl;
 			cout << "Enter ID number of new instructor: ";
 			cin >> id2;
@@ -362,12 +539,12 @@ void menuAdmin(sqlite3* db, string username) {
 			cin >> pass2;
 			admin1.add_instructor(id2, name2, surname2, title2, year2, dept2, email2, pass2);
 			break;
-		case 7: // remove instructor
+		case 8: // remove instructor
 			cout << "Enter the ID of the instructor you want to remove: ";
 			cin >> id2;
 			admin1.remove_instructor(id2);
 			break;
-		case 8: // add student
+		case 9: // add student
 			cout << "Adding a student" << endl;
 			cout << "Enter ID of new student: ";
 			cin >> id2;
@@ -385,18 +562,119 @@ void menuAdmin(sqlite3* db, string username) {
 			cin >> pass2;
 			admin1.add_student(id2, name2, surname2, year2, major2, email2, pass2);
 			break;
-		case 9:	// remove student
+		case 10:	// remove student
 			cout << "Enter the ID of the student you want to remove: ";
 			cin >> id2;
 			admin1.remove_student(id2);
 			break;
-		case 10:
+		case 11:	// add student to course
+			cout << "Enter the CRN of the course: ";
+			cin >> crn;
+
+			query = "SELECT * FROM ROSTER WHERE ROSTER.CRN = '" + crn + "'";
+			exit = sqlite3_exec(db, query.c_str(), callback2save, &container, &messageError);
+
+			cout << "CRN -- STUDENT 1 -- STUDENT 2 -- STUDENT 3 -- STUDENT 4 -- STUDENT 5" << endl;
+			L = container.size();
+			for (int i = 0; i < L; i++) {
+				cout << container[i];
+				//container.erase(container.begin());
+				if ((((i + 1) % 6) == 0) && (i > 0))
+					cout << endl;
+				else
+					cout << " -- ";
+			}
+			if (container[5] != "EMPTY") {
+				cout << "There is no more space in this course." << endl;
+			}
+			else {
+				cout << "Enter the username of the student: ";
+				cin >> email2;
+				for (int i = 1; i < 6; i++) {
+					if (container[i] == email2) {
+						found = 1;
+					}
+				}
+				if (found == 1) {
+					cout << "Student is already registered for this course." << endl;
+					break;
+				}
+				else {
+					for (int i = 1; i < 6; i++) {
+						if (container[i] == "EMPTY") {
+							container[i] = email2;
+							break;
+						}
+					}
+				}
+			}
+			query = ("DELETE FROM ROSTER WHERE CRN = " + crn);
+			exit = sqlite3_exec(db, query.c_str(), NULL, 0, &messageError);
+			query = ("INSERT INTO ROSTER VALUES(" + container[0] + ",'" + container[1] + "','" + container[2] + "','" +
+				container[3] + "','" + container[4] + "','" + container[5] + "');");
+			exit = sqlite3_exec(db, query.c_str(), NULL, 0, &messageError);
+			if (exit != SQLITE_OK)
+			{
+				std::cerr << "Error Insert" << std::endl;
+				sqlite3_free(messageError);
+			}
+			else
+				std::cout << "Roster created successfully!" << std::endl;
+
+			container.clear();
+			break;
+		case 12:	// remove student from course
+			cout << "Enter the CRN of the course: ";
+			cin >> crn;
+
+			query = "SELECT * FROM ROSTER WHERE ROSTER.CRN = '" + crn + "'";
+			exit = sqlite3_exec(db, query.c_str(), callback2save, &container, &messageError);
+
+			cout << "CRN -- STUDENT 1 -- STUDENT 2 -- STUDENT 3 -- STUDENT 4 -- STUDENT 5" << endl;
+			L = container.size();
+			for (int i = 0; i < L; i++) {
+				cout << container[i];
+				//container.erase(container.begin());
+				if ((((i + 1) % 6) == 0) && (i > 0))
+					cout << endl;
+				else
+					cout << " -- ";
+			}
+			if (container[1] == "EMPTY") {
+				cout << "There are no students in this course." << endl;
+			}
+			else {
+				cout << "Enter the username of the student: ";
+				cin >> email2;
+				for (int i = 1; i < 6; i++) {
+					if (container[i] == email2) {
+						container.erase(container.begin() + i);
+						container.push_back("EMPTY");
+						break;
+					}
+				}
+			}
+			query = ("DELETE FROM ROSTER WHERE CRN = " + crn);
+			exit = sqlite3_exec(db, query.c_str(), NULL, 0, &messageError);
+			query = ("INSERT INTO ROSTER VALUES(" + container[0] + ",'" + container[1] + "','" + container[2] + "','" +
+				container[3] + "','" + container[4] + "','" + container[5] + "');");
+			exit = sqlite3_exec(db, query.c_str(), NULL, 0, &messageError);
+			if (exit != SQLITE_OK)
+			{
+				std::cerr << "Error Insert" << std::endl;
+				sqlite3_free(messageError);
+			}
+			else
+				std::cout << "Roster created successfully!" << std::endl;
+			container.clear();
+			break;
+		case 13:
 			cout << "Exiting...\n";
 			break;
 		default:
 			cout << "Invalid choice, please try again.\n";
 		}
-	} while (choice != 10);
+	} while (choice != 13);
 
 	admin1.~admin1();
 }
