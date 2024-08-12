@@ -22,7 +22,6 @@ public:
     void remove_instructor(string id_in);
     void add_student(string id, string name, string surname, string gradyear, string major, string email, string pass);
     void remove_student(string id_in);
-    void print_roster();
     void print_info();
 
     // destructor
