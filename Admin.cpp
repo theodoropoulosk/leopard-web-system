@@ -35,7 +35,19 @@ void Admin::add_courses(string crn, string title, string dept, string time,
 		sqlite3_free(messageError);
 	}
 	else
-		std::cout << "Records created Successfully!" << std::endl;
+		std::cout << "Course created successfully!" << std::endl;
+
+	sql = ("INSERT INTO ROSTER VALUES(" + crn + ", 'EMPTY', 'EMPTY', 'EMPTY', 'EMPTY', 'EMPTY');");
+
+	exit = sqlite3_exec(DB, sql.c_str(), NULL, 0, &messageError);
+
+	if (exit != SQLITE_OK)
+	{
+		std::cerr << "Error Insert" << std::endl;
+		sqlite3_free(messageError);
+	}
+	else
+		std::cout << "Roster created successfully!" << std::endl;
 
 	sqlite3_close(DB);
 }
@@ -57,7 +69,19 @@ void Admin::remove_courses(int in_crn) {
 		sqlite3_free(messageError);
 	}
 	else
-		std::cout << "Records deleted Successfully!" << std::endl;
+		std::cout << "Course deleted successfully!" << std::endl;
+
+	sql = ("DELETE FROM ROSTER WHERE CRN = " + crn);
+
+	exit = sqlite3_exec(DB, sql.c_str(), NULL, 0, &messageError);
+
+	if (exit != SQLITE_OK)
+	{
+		std::cerr << "Error Delete" << std::endl;
+		sqlite3_free(messageError);
+	}
+	else
+		std::cout << "Roster deleted successfully!" << std::endl;
 
 	sqlite3_close(DB);
 }
@@ -149,11 +173,6 @@ void Admin::remove_student(string id_in) {
 
 	sqlite3_close(DB);
 }
-
-void Admin::print_roster() {
-	cout << "Method for printing roster called by Admin" << endl;
-}
-
 
 void Admin::print_info() {
 	cout << "ID: " << ID << ", Name: " << name << " " << surname << endl;
